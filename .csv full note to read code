@@ -1,0 +1,60 @@
+Databricks Notebook: Read CSV from Azure Blob (No Mount)
+🔹 Step 1: Set Storage Configuration
+# Azure Storage details
+container = "srccontainer"
+storageAccount = "src2603"
+accessKey = "YOUR_ACCESS_KEY"   # 🔴 replace with your real key
+
+# Spark config key
+accountKey = f"fs.azure.account.key.{storageAccount}.blob.core.windows.net"
+
+# Set configuration
+spark.conf.set(accountKey, accessKey)
+
+print("✅ Storage configured successfully")
+🔹 Step 2: Verify Connection (List Files)
+# List files in container
+path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/"
+
+files = dbutils.fs.ls(path)
+display(files)
+
+👉 This step helps confirm:
+
+Container exists ✅
+File name is correct ✅
+🔹 Step 3: Read CSV File
+# Correct file path (NO duplicate container, NO double .csv)
+file_path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/usd_to_eur.csv"
+
+# Read CSV
+df = spark.read.csv(file_path, header=True, inferSchema=True)
+
+display(df)
+🔹 Step 4: Basic Data Checks
+# Show schema
+df.printSchema()
+
+# Show top 5 rows
+df.show(5)
+
+# Count rows
+print("Row count:", df.count())
+🔹 Step 5: Example Transformations
+# Example: Select specific columns
+df.select("*").show(5)
+
+# Example: Filter data (modify column name as per your file)
+# df.filter(df["rate"] > 1.0).show()
+🔹 Step 6: Save as Table (Optional)
+# Save as managed table
+df.write.mode("overwrite").saveAsTable("usd_to_eur_table")
+
+# Query table
+display(spark.sql("SELECT * FROM usd_to_eur_table"))
+🔹 Step 7: Save as Parquet (Optional)
+output_path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/output/usd_to_eur_parquet"
+
+df.write.mode("overwrite").parquet(output_path)
+
+print("✅ Data saved as Parquet")

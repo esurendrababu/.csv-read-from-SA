@@ -1,0 +1,16 @@
+container = "container name"
+storageAccount = "Storage account name"
+accessKey = "Access key of storage account"
+
+accountKey = f"fs.azure.account.key.{storageAccount}.blob.core.windows.net"
+
+# सेट spark config
+spark.conf.set(accountKey, accessKey)
+
+# Direct access path
+input_path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/"
+
+# Example: Read data
+df = spark.read.csv(input_path)
+
+display(df)

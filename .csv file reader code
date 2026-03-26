@@ -14,3 +14,10 @@ input_path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/"
 df = spark.read.csv(input_path)
 
 display(df)
+
+
+#read the file
+file_path = f"wasbs://{container}@{storageAccount}.blob.core.windows.net/usd_to_eur.csv"
+
+df = spark.read.csv(file_path, header=True, inferSchema=True)
+display(df)
